@@ -114,7 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     if (Platform.isAndroid) {
                       folder = Directory("/storage/emulated/0/Download");
                     } else if (Platform.isWindows) {
-                      folder = Directory(Platform.resolvedExecutable);
+                      folder =
+                          Directory(path.dirname(Platform.resolvedExecutable));
                     }
 
                     //'https://mp.weixin.qq.com/s/a7rWV1a_puEsn6GMKVTa_g'
@@ -128,23 +129,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     if (response.statusCode == 200) {
                       String body = response.body;
                       var doc = parse(body);
-                      doc
-                          .getElementsByClassName(
-                              'rich_pages js_insertlocalimg wxw-img')
-                          .forEach((element) async {
-                        var srcUrl = element.attributes['data-src'];
+                      for (var item
+                          in doc.getElementsByClassName('rich_pages wxw-img')) {
+                        var srcUrl = item.attributes['data-src'];
                         debugPrint(srcUrl);
 
                         // Download Image
                         var res = await http.get(Uri.parse(srcUrl!));
-                        var dir = await path_provider
-                            .getApplicationDocumentsDirectory();
                         var ext = Uri.parse(srcUrl).queryParameters['wx_fmt'];
                         var localPath = path.join(folder.path,
                             '${DateTime.now().millisecondsSinceEpoch}.$ext');
+                        print(localPath);
                         var imageFile = File(localPath);
                         await imageFile.writeAsBytes(res.bodyBytes);
-                      });
+                      }
 
                       showToast('下载完成');
                     }
