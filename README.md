@@ -1,2 +1,10 @@
-# parse_wx_article
-flutter解析微信文章图片
+---
+typora-root-url: ./screenshot
+---
+
+# flutter解析微信文章图片
+
+| Windows                  | Android                  |
+| ------------------------ | ------------------------ |
+| ![Windows](/Windows.jpg) | ![Android](/Android.jpg) |
+
