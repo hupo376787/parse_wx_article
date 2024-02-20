@@ -1,5 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -41,8 +42,14 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final TextEditingController _urlController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
               child: TextField(
                 controller: _urlController,
+                enableInteractiveSelection: true,
                 decoration: InputDecoration(
                     border: const OutlineInputBorder(),
                     hintText: '请输入微信文章地址',
@@ -162,5 +170,33 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    debugPrint("当前的应用生命周期状态 : $state");
+
+    if (state == AppLifecycleState.paused) {
+      debugPrint("应用进入后台 paused");
+    } else if (state == AppLifecycleState.resumed) {
+      debugPrint("应用进入前台 resumed");
+      var clipp = await Clipboard.getData(Clipboard.kTextPlain);
+      _urlController.text = clipp!.text!;
+    } else if (state == AppLifecycleState.inactive) {
+      // 应用进入非活动状态 , 如来了个电话 , 电话应用进入前台
+      // 本应用进入该状态
+      debugPrint("应用进入非活动状态 inactive");
+    } else if (state == AppLifecycleState.detached) {
+      // 应用程序仍然在 Flutter 引擎上运行 , 但是与宿主 View 组件分离
+      debugPrint("应用进入 detached 状态 detached");
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
   }
 }
