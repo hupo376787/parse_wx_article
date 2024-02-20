@@ -39,10 +39,11 @@ dependencies:
   html:
   path:
   path_provider:
-  fl_toast:
+  bot_toast:
   oktoast:
   system_theme:
   permission_handler:
+  ms_undraw:
 
 dev_dependencies:
   flutter_test:
