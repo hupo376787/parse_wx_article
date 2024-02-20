@@ -1,0 +1,11 @@
+# AppId 的值唯一标识此应用。
+# 不要在其他应用的安装程序中使用相同的 AppId 值。
+app_id: Vincent8-42B1-4826-A479-AF079F21A65D
+publisher: Vincent
+publisher_url: 
+display_name: 微信文章图片下载
+create_desktop_icon: true
+install_dir_name: 微信文章图片下载
+locales:
+  - en
+  - zh

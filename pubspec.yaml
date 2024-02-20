@@ -45,6 +45,7 @@ dependencies:
   permission_handler:
   ms_undraw:
   lottie:
+  window_manager:
 
 dev_dependencies:
   flutter_test:
