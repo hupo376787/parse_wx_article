@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:ms_undraw/ms_undraw.dart';
 import 'package:lottie/lottie.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,14 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(const MyApp());
+  await SentryFlutter.init(
+    (options) {
+      options.dsn =
+          'https://bb158a849e212c311c4c7d077e9db600@o4506782294671360.ingest.sentry.io/4506782299193344';
+    },
+    // Init your App.
+    appRunner: () => runApp(const MyApp()),
+  );
 }
 
 final ThemeData theme = ThemeData();

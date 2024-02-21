@@ -46,6 +46,7 @@ dependencies:
   ms_undraw:
   lottie:
   window_manager:
+  sentry_flutter:
 
 dev_dependencies:
   flutter_test:
