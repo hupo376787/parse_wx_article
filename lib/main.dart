@@ -17,21 +17,23 @@ import 'package:window_manager/window_manager.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  // 必须加上这一行。
-  await windowManager.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    WidgetsFlutterBinding.ensureInitialized();
+    // 必须加上这一行。
+    await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = const WindowOptions(
-      size: Size(1280, 720),
-      center: true,
-      backgroundColor: Colors.transparent,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.normal,
-      title: '微信文章图片下载');
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+    WindowOptions windowOptions = const WindowOptions(
+        size: Size(1280, 720),
+        center: true,
+        backgroundColor: Colors.transparent,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.normal,
+        title: '微信文章图片下载');
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
 
   await SentryFlutter.init(
     (options) {
@@ -170,12 +172,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         String body = response.body;
                         int i = 0;
 
+                        const start = "var picturePageInfoList = ";
+                        const end = "picturePageInfoList";
+                        final startIndex = body.indexOf(start);
+                        final endIndex =
+                            body.indexOf(end, startIndex + start.length);
+                        final jsonString = body.substring(
+                            startIndex + start.length + 1, endIndex - 2);
+                        debugPrint(jsonString);
                         final urlRegExp = RegExp(
                             r"((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?");
-                        final urlMatches = urlRegExp.allMatches(body);
+                        final urlMatches = urlRegExp.allMatches(jsonString);
                         List<String> urls = urlMatches
-                            .map((urlMatch) =>
-                                body.substring(urlMatch.start, urlMatch.end))
+                            .map((urlMatch) => jsonString.substring(
+                                urlMatch.start, urlMatch.end))
                             .toSet() //List去重
                             .toList();
                         //urls.forEach((x) => print(x));
