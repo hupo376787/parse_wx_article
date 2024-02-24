@@ -47,6 +47,7 @@ dependencies:
   lottie:
   window_manager:
   sentry_flutter:
+  double_back_to_close:
 
 dev_dependencies:
   flutter_test:

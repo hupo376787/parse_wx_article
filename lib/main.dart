@@ -15,6 +15,7 @@ import 'package:ms_undraw/ms_undraw.dart';
 import 'package:lottie/lottie.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:double_back_to_close/double_back_to_close.dart';
 
 void main() async {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
@@ -54,13 +55,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return OKToast(
         child: MaterialApp(
-      title: '微信文章图片下载',
-      builder: BotToastInit(),
-      navigatorObservers: [BotToastNavigatorObserver()],
-      theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange)),
-      home: const MyHomePage(title: '微信文章图片下载'),
-    ));
+            title: '微信文章图片下载',
+            builder: BotToastInit(),
+            navigatorObservers: [BotToastNavigatorObserver()],
+            theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange)),
+            home: const DoubleBack(
+              message: "再按一次退出",
+              child: MyHomePage(title: '微信文章图片下载'),
+            )));
   }
 }
 
@@ -72,13 +75,24 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+class _MyHomePageState extends State<MyHomePage>
+    with WidgetsBindingObserver, WindowListener {
   final TextEditingController _urlController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    windowManager.addListener(this);
+    _init();
+  }
+
+  void _init() async {
+    // 添加此行以覆盖默认关闭处理程序
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      await windowManager.setPreventClose(true);
+    }
+    setState(() {});
   }
 
   @override
@@ -91,7 +105,8 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Column(children: <Widget>[
+      body: SingleChildScrollView(
+          child: Column(children: <Widget>[
         Align(
           alignment: Alignment.bottomRight,
           child: Container(
@@ -99,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             child: IconButton(
                 onPressed: () async {
                   bool? res = await showMySimpleDialog(context,
-                      '下载目录说明\r\nWindows: 根目录Download文件夹\r\nAndroid: /storage/emulated/0/Download\r\n其他: 没设备没法测试');
+                      '下载目录说明\r\nWindows: 根目录Download\r\nAndroid: /storage/emulated/0/Download\r\n其他: 没设备没法测试');
                   if (res == null) {
                     debugPrint('取消');
                   } else {
@@ -236,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
             ],
           ),
         )
-      ]),
+      ])),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
@@ -265,9 +280,47 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
+  bool isShowing = false;
+  @override
+  void onWindowClose() async {
+    bool isPreventClose = await windowManager.isPreventClose();
+    if (isPreventClose && !isShowing) {
+      if (!mounted) return;
+      isShowing = true;
+
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: const Text('确定关闭程序?'),
+            actions: [
+              TextButton(
+                child: const Text('取消'),
+                onPressed: () {
+                  isShowing = false;
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('确定'),
+                onPressed: () async {
+                  isShowing = true;
+                  Navigator.of(context).pop();
+                  await windowManager.destroy();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    windowManager.removeListener(this);
   }
 }
