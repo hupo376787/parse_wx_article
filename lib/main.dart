@@ -177,7 +177,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         final startIndex = body.indexOf(start);
                         final endIndex =
                             body.indexOf(end, startIndex + start.length);
-                        final jsonString = body.substring(
+if(startIndex == -1 && endIndex == -1){
+start ="
+  window.picture_page_info_list ";
+end="window.appmsgalbuminfo";
+startIndex = body.indexOf(start);
+                        endIndex =
+                            body.indexOf(end, startIndex + start.length);
+}
+                        final
+ jsonString = body.substring(
                             startIndex + start.length + 1, endIndex - 2);
                         debugPrint(jsonString);
                         final urlRegExp = RegExp(
