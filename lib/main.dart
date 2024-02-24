@@ -172,21 +172,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                         String body = response.body;
                         int i = 0;
 
-                        const start = "var picturePageInfoList = ";
-                        const end = "picturePageInfoList";
-                        final startIndex = body.indexOf(start);
-                        final endIndex =
+                        var start = "var picturePageInfoList = ";
+                        var end = "picturePageInfoList";
+                        var startIndex = body.indexOf(start);
+                        var endIndex =
                             body.indexOf(end, startIndex + start.length);
-if(startIndex == -1 && endIndex == -1){
-start ="
-  window.picture_page_info_list ";
-end="window.appmsgalbuminfo";
-startIndex = body.indexOf(start);
-                        endIndex =
-                            body.indexOf(end, startIndex + start.length);
-}
-                        final
- jsonString = body.substring(
+                        if (startIndex == -1 && endIndex == -1) {
+                          start = "window.picture_page_info_list ";
+                          end = "window.appmsgalbuminfo";
+                          startIndex = body.indexOf(start);
+                          endIndex =
+                              body.indexOf(end, startIndex + start.length);
+                        }
+                        final jsonString = body.substring(
                             startIndex + start.length + 1, endIndex - 2);
                         debugPrint(jsonString);
                         final urlRegExp = RegExp(
