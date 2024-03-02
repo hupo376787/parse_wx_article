@@ -232,10 +232,9 @@ class _MyHomePageState extends State<MyHomePage>
                               '${DateTime.now().millisecondsSinceEpoch}.$ext');
                           debugPrint(localPath);
                           var imageFile = File(localPath);
-                          if (res.bodyBytes.length > 50 * 1024) {
-                            await imageFile.writeAsBytes(res.bodyBytes);
-                            i++;
-                          }
+
+                          await imageFile.writeAsBytes(res.bodyBytes);
+                          i++;
                         }
 
                         showMyToast('下载了$i张图片');
