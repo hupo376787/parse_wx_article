@@ -7,19 +7,22 @@ import 'package:parse_wx_article/helper/dialog_helper.dart';
 
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:parse_wx_article/setting_page.dart';
+import 'package:parse_wx_article/splash_screen.dart';
 import 'package:path/path.dart' as path;
 import 'package:oktoast/oktoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:ms_undraw/ms_undraw.dart';
 import 'package:lottie/lottie.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:double_back_to_close/double_back_to_close.dart';
+import 'package:theme_manager/theme_manager.dart';
+import 'package:theme_manager/theme_picker_dialog.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    WidgetsFlutterBinding.ensureInitialized();
     // 必须加上这一行。
     await windowManager.ensureInitialized();
 
@@ -53,23 +56,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OKToast(
-        child: MaterialApp(
-            title: '微信文章图片下载',
-            builder: BotToastInit(),
-            navigatorObservers: [BotToastNavigatorObserver()],
-            theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange)),
-            home: const DoubleBack(
-              message: "再按一次退出",
-              child: MyHomePage(title: '微信文章图片下载'),
-            )));
+    return ThemeManager(
+        defaultBrightnessPreference: BrightnessPreference.light,
+        data: (Brightness brightness) => ThemeData(
+              primarySwatch: Colors.orange,
+              brightness: brightness,
+            ),
+        themedBuilder: (BuildContext context, ThemeState state) {
+          return OKToast(
+              child: MaterialApp(
+                  title: '微信文章图片下载',
+                  builder: BotToastInit(),
+                  navigatorObservers: [BotToastNavigatorObserver()],
+                  theme: state.themeData,
+                  home: const SplashScreen()));
+        });
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+  const MyHomePage({super.key});
+  // final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -100,11 +107,6 @@ class _MyHomePageState extends State<MyHomePage>
     final appSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
       body: SingleChildScrollView(
           child: Column(children: <Widget>[
         Align(
@@ -113,13 +115,18 @@ class _MyHomePageState extends State<MyHomePage>
             padding: const EdgeInsets.all(4),
             child: IconButton(
                 onPressed: () async {
-                  bool? res = await showMySimpleDialog(context,
-                      '下载目录说明\r\nWindows: 根目录Download\r\nAndroid: /storage/emulated/0/Download\r\n其他: 没设备没法测试');
-                  if (res == null) {
-                    debugPrint('取消');
-                  } else {
-                    debugPrint('确定');
-                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingPage()),
+                  );
+                  // bool? res = await showMySimpleDialog(context,
+                  //     '下载目录说明\r\nWindows: 根目录Download\r\nAndroid: /storage/emulated/0/Download\r\n其他: 没设备没法测试');
+                  // if (res == null) {
+                  //   debugPrint('取消');
+                  // } else {
+                  //   debugPrint('确定');
+                  // }
                 },
                 icon: const Icon(Icons.settings)),
           ),
@@ -129,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Lottie.asset('assets/lottie/1708440553399.json',
-                  height: appSize.height / 3),
+                  height: appSize.height / 2),
               // UnDraw(
               //   height: 1,
               //   color: Colors.orange,
@@ -155,6 +162,8 @@ class _MyHomePageState extends State<MyHomePage>
                   backgroundColor: Colors.orange,
                   onPressed: () async {
                     try {
+                      showMyToast('开始下载');
+
                       var status = await Permission.storage.status;
                       if (!status.isGranted) {
                         await Permission.storage.request();
