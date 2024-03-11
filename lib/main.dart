@@ -249,13 +249,6 @@ class _MyHomePageState extends State<MyHomePage>
                   child: const Icon(Icons.download),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(top: 16),
-                child: const Text(
-                  '程序自动过滤50KB以下的图片',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              )
             ],
           ),
         )
