@@ -1,6 +1,8 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:html/parser.dart';
+import 'package:parse_wx_article/helper/download_helper.dart';
 
 import 'package:parse_wx_article/helper/toast_helper.dart';
 import 'package:parse_wx_article/helper/dialog_helper.dart';
@@ -86,6 +88,8 @@ class _MyHomePageState extends State<MyHomePage>
     with WidgetsBindingObserver, WindowListener {
   final TextEditingController _urlController = TextEditingController();
 
+  String groupValue = 'article';
+
   @override
   void initState() {
     super.initState();
@@ -157,12 +161,83 @@ class _MyHomePageState extends State<MyHomePage>
               ),
               Container(
                 padding: const EdgeInsets.only(top: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    InkWell(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child: SizedBox(
+                        width: 160,
+                        height: 44,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Radio(
+                              groupValue: groupValue,
+                              value: 'article',
+                              onChanged: (value) {
+                                setState(() {
+                                  groupValue = value!;
+                                });
+                              },
+                            ),
+                            const Text('文章图片'),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 20),
+                              child: Icon(Icons.dashboard),
+                            )
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          groupValue = 'article';
+                        });
+                      },
+                    ),
+                    InkWell(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      child: SizedBox(
+                        width: 160,
+                        height: 44,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Radio(
+                              groupValue: groupValue,
+                              value: 'cover',
+                              onChanged: (value) {
+                                setState(() {
+                                  groupValue = value!;
+                                });
+                              },
+                            ),
+                            const Text('封面图片'),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 20),
+                              child: Icon(Icons.image),
+                            )
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          groupValue = 'cover';
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(top: 16),
                 child: FloatingActionButton(
                   shape: const CircleBorder(),
                   backgroundColor: Colors.orange,
                   onPressed: () async {
                     try {
                       showMyToast('开始下载');
+                      debugPrint(groupValue);
 
                       var status = await Permission.storage.status;
                       if (!status.isGranted) {
@@ -196,48 +271,57 @@ class _MyHomePageState extends State<MyHomePage>
                         String body = response.body;
                         int i = 0;
 
-                        var start = "var picturePageInfoList = ";
-                        var end = "picturePageInfoList";
-                        var startIndex = body.indexOf(start);
-                        var endIndex =
-                            body.indexOf(end, startIndex + start.length);
-                        if (startIndex == -1 && endIndex == -1) {
-                          start = "window.picture_page_info_list ";
-                          end = "window.appmsgalbuminfo";
-                          startIndex = body.indexOf(start);
-                          endIndex =
+                        if (groupValue == 'article') {
+                          var start = "var picturePageInfoList = ";
+                          var end = "picturePageInfoList";
+                          var startIndex = body.indexOf(start);
+                          var endIndex =
                               body.indexOf(end, startIndex + start.length);
+                          if (startIndex == -1 && endIndex == -1) {
+                            start = "window.picture_page_info_list ";
+                            end = "window.appmsgalbuminfo";
+                            startIndex = body.indexOf(start);
+                            endIndex =
+                                body.indexOf(end, startIndex + start.length);
+                          }
+                          final jsonString = body.substring(
+                              startIndex + start.length + 1, endIndex - 2);
+                          debugPrint(jsonString);
+                          final urlRegExp = RegExp(
+                              r"((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?");
+                          final urlMatches = urlRegExp.allMatches(jsonString);
+                          List<String> urls = urlMatches
+                              .map((urlMatch) => jsonString.substring(
+                                  urlMatch.start, urlMatch.end))
+                              .toSet() //List去重
+                              .toList();
+                          //urls.forEach((x) => print(x));
+                          for (var item in urls) {
+                            if (!item.contains('wx_fmt=')) continue;
+
+                            debugPrint(item);
+
+                            // Download Image
+                            downloadFileFromUrl(item, folder);
+                            i++;
+                          }
+
+                          showMyToast('下载了$i张图片');
+                        } else {
+                          var doc = parse(body);
+                          doc
+                              .getElementsByTagName('meta')
+                              .where((element) =>
+                                  element.attributes['property'] == 'og:image')
+                              .forEach((element) async {
+                            var item = element.attributes['content'];
+                            debugPrint(item);
+
+                            // Download Image
+                            downloadFileFromUrl(item!, folder);
+                            showMyToast('封面已下载');
+                          });
                         }
-                        final jsonString = body.substring(
-                            startIndex + start.length + 1, endIndex - 2);
-                        debugPrint(jsonString);
-                        final urlRegExp = RegExp(
-                            r"((https?:www\.)|(https?:\/\/)|(www\.))[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9]{1,6}(\/[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)?");
-                        final urlMatches = urlRegExp.allMatches(jsonString);
-                        List<String> urls = urlMatches
-                            .map((urlMatch) => jsonString.substring(
-                                urlMatch.start, urlMatch.end))
-                            .toSet() //List去重
-                            .toList();
-                        //urls.forEach((x) => print(x));
-                        for (var item in urls) {
-                          if (!item.contains('wx_fmt=')) continue;
-
-                          debugPrint(item);
-
-                          // Download Image
-                          var res = await http.get(Uri.parse(item));
-                          var ext = Uri.parse(item).queryParameters['wx_fmt'];
-                          var localPath = path.join(folder.path,
-                              '${DateTime.now().millisecondsSinceEpoch}.$ext');
-                          debugPrint(localPath);
-                          var imageFile = File(localPath);
-
-                          await imageFile.writeAsBytes(res.bodyBytes);
-                          i++;
-                        }
-
-                        showMyToast('下载了$i张图片');
                       } else {
                         showMyToast('网络错误，请稍后重试');
                       }

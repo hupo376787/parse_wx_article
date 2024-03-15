@@ -73,7 +73,7 @@ class _SettingPageState extends State<SettingPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Radio(
-                            groupValue: 1,
+                            groupValue: 'Light',
                             value: 'Light',
                             onChanged: (value) {
                               ThemeManager.of(context)
@@ -102,7 +102,7 @@ class _SettingPageState extends State<SettingPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Radio(
-                            groupValue: 1,
+                            groupValue: 'Dark',
                             value: 'Dark',
                             onChanged: (value) {
                               ThemeManager.of(context)
