@@ -40,7 +40,6 @@ dependencies:
   path:
   path_provider:
   bot_toast:
-  oktoast:
   system_theme:
   permission_handler:
   ms_undraw:
@@ -51,7 +50,8 @@ dependencies:
   theme_manager:
   flutter_launcher_icons:
   another_flutter_splash_screen:
-
+  flutter_in_app_pip:
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

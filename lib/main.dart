@@ -2,25 +2,21 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart';
-import 'package:parse_wx_article/helper/download_helper.dart';
 
+import 'package:parse_wx_article/helper/download_helper.dart';
 import 'package:parse_wx_article/helper/toast_helper.dart';
-import 'package:parse_wx_article/helper/dialog_helper.dart';
 
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:parse_wx_article/setting_page.dart';
 import 'package:parse_wx_article/splash_screen.dart';
 import 'package:path/path.dart' as path;
-import 'package:oktoast/oktoast.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:lottie/lottie.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:theme_manager/theme_manager.dart';
-import 'package:theme_manager/theme_picker_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,13 +61,12 @@ class MyApp extends StatelessWidget {
               brightness: brightness,
             ),
         themedBuilder: (BuildContext context, ThemeState state) {
-          return OKToast(
-              child: MaterialApp(
-                  title: '微信文章图片下载',
-                  builder: BotToastInit(),
-                  navigatorObservers: [BotToastNavigatorObserver()],
-                  theme: state.themeData,
-                  home: const SplashScreen()));
+          return MaterialApp(
+              title: '微信文章图片下载',
+              builder: BotToastInit(),
+              navigatorObservers: [BotToastNavigatorObserver()],
+              theme: state.themeData,
+              home: const SplashScreen());
         });
   }
 }
