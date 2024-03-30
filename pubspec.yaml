@@ -50,7 +50,8 @@ dependencies:
   theme_manager:
   flutter_launcher_icons:
   another_flutter_splash_screen:
-  flutter_in_app_pip:
+  hive:
+  hive_flutter:
   
 dev_dependencies:
   flutter_test:

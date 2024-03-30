@@ -1,6 +1,8 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:html/parser.dart';
 
 import 'package:parse_wx_article/helper/download_helper.dart';
@@ -84,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage>
   final TextEditingController _urlController = TextEditingController();
 
   String groupValue = 'article';
+  late Box db;
 
   @override
   void initState() {
@@ -91,6 +94,8 @@ class _MyHomePageState extends State<MyHomePage>
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
     _init();
+
+    initDb();
   }
 
   void _init() async {
@@ -99,6 +104,11 @@ class _MyHomePageState extends State<MyHomePage>
       await windowManager.setPreventClose(true);
     }
     setState(() {});
+  }
+
+  void initDb() async {
+    await Hive.initFlutter();
+    db = await Hive.openBox('history');
   }
 
   @override
@@ -231,6 +241,13 @@ class _MyHomePageState extends State<MyHomePage>
                   backgroundColor: Colors.orange,
                   onPressed: () async {
                     try {
+                      //先查找历史记录
+                      if (groupValue == 'article' &&
+                          db.values.contains(_urlController.text)) {
+                        showMyToast('文章图片已经下载过啦');
+                        return;
+                      }
+
                       showMyToast('开始下载');
                       debugPrint(groupValue);
 
@@ -302,6 +319,12 @@ class _MyHomePageState extends State<MyHomePage>
                           }
 
                           showMyToast('下载了$i张图片');
+
+                          //添加数据库
+                          db.put(
+                              (DateTime.now().millisecondsSinceEpoch / 1000)
+                                  .toString(),
+                              _urlController.text);
                         } else {
                           var doc = parse(body);
                           doc
