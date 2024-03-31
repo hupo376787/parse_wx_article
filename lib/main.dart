@@ -257,7 +257,14 @@ class _MyHomePageState extends State<MyHomePage>
                   backgroundColor: Colors.orange,
                   onPressed: () async {
                     try {
-                      //先查找历史记录
+                      if (_urlController.text.isEmpty ||
+                          !_urlController.text
+                              .startsWith('https://mp.weixin.qq.com/')) {
+                        showMyToast('请输入正确的微信文章地址');
+                        return;
+                      }
+
+                      //查找历史记录
                       if (groupValue == 'article' &&
                           db.values.contains(_urlController.text)) {
                         showMyToast('文章图片已经下载过啦');
@@ -287,12 +294,6 @@ class _MyHomePageState extends State<MyHomePage>
                             .getApplicationDocumentsDirectory();
                       }
 
-                      if (_urlController.text.isEmpty ||
-                          !_urlController.text
-                              .startsWith('https://mp.weixin.qq.com/')) {
-                        showMyToast('请输入正确的微信文章地址');
-                        return;
-                      }
                       var response =
                           await http.get(Uri.parse(_urlController.text));
                       if (response.statusCode == 200) {
