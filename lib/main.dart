@@ -10,6 +10,7 @@ import 'package:parse_wx_article/helper/toast_helper.dart';
 
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:parse_wx_article/history_page.dart';
 import 'package:parse_wx_article/setting_page.dart';
 import 'package:parse_wx_article/splash_screen.dart';
 import 'package:path/path.dart' as path;
@@ -75,18 +76,18 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
-  // final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
+
+late Box db;
 
 class _MyHomePageState extends State<MyHomePage>
     with WidgetsBindingObserver, WindowListener {
   final TextEditingController _urlController = TextEditingController();
 
   String groupValue = 'article';
-  late Box db;
 
   @override
   void initState() {
@@ -138,6 +139,21 @@ class _MyHomePageState extends State<MyHomePage>
                   // }
                 },
                 icon: const Icon(Icons.settings)),
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+            child: IconButton(
+                onPressed: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HistoryPage()),
+                  );
+                },
+                icon: const Icon(Icons.list)),
           ),
         ),
         Center(
@@ -322,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage>
 
                           //添加数据库
                           db.put(
-                              (DateTime.now().millisecondsSinceEpoch / 1000)
+                              (DateTime.now().microsecondsSinceEpoch)
                                   .toString(),
                               _urlController.text);
                         } else {

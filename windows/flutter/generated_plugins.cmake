@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   screen_retriever
   sentry_flutter
   system_theme
+  webview_universal
   window_manager
 )
 

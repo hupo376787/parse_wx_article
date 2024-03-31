@@ -52,6 +52,7 @@ dependencies:
   another_flutter_splash_screen:
   hive:
   hive_flutter:
+  webview_universal :
   
 dev_dependencies:
   flutter_test:
