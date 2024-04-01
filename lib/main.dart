@@ -11,6 +11,7 @@ import 'package:parse_wx_article/helper/toast_helper.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:parse_wx_article/history_page.dart';
+import 'package:parse_wx_article/model/history_model.dart';
 import 'package:parse_wx_article/setting_page.dart';
 import 'package:parse_wx_article/splash_screen.dart';
 import 'package:path/path.dart' as path;
@@ -109,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage>
 
   void initDb() async {
     await Hive.initFlutter();
-    db = await Hive.openBox('history');
+    Hive.registerAdapter(HistoryModelAdapter());
+    db = await Hive.openBox<HistoryModel>('history');
   }
 
   @override
@@ -337,11 +339,31 @@ class _MyHomePageState extends State<MyHomePage>
 
                           showMyToast('下载了$i张图片');
 
+                          //获取标题
+                          var doc = parse(body);
+                          String? title;
+                          doc
+                              .getElementsByTagName('meta')
+                              .where((element) =>
+                                  element.attributes['property'] == 'og:title')
+                              .forEach((element) async {
+                            title = element.attributes['content'];
+                            debugPrint(title);
+                          });
+
                           //添加数据库
-                          db.put(
-                              (DateTime.now().microsecondsSinceEpoch)
-                                  .toString(),
-                              _urlController.text);
+                          try {
+                            db.put(
+                                db.length.toString(),
+                                HistoryModel(
+                                    db.length,
+                                    (DateTime.now().microsecondsSinceEpoch)
+                                        .toString(),
+                                    title!,
+                                    _urlController.text));
+                          } catch (error) {
+                            debugPrint(error.toString());
+                          }
                         } else {
                           var doc = parse(body);
                           doc

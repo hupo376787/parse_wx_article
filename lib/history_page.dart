@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:parse_wx_article/helper/toast_helper.dart';
 import 'package:parse_wx_article/main.dart';
 import 'package:parse_wx_article/model/history_model.dart';
 import 'package:parse_wx_article/webview_page.dart';
@@ -18,10 +17,12 @@ class _HistoryPageState extends State<HistoryPage> {
     super.initState();
 
     for (var i = db.length - 1; i >= 0; i--) {
-      int timespan = double.tryParse(db.keyAt(i).toString())!.toInt();
+      int index = int.tryParse(db.keyAt(i).toString())!;
+      var his = db.getAt(i) as HistoryModel;
+      int timespan = double.tryParse(his.timespan)!.toInt();
       var date = DateTime.fromMicrosecondsSinceEpoch(timespan);
-      histories
-          .add(HistoryModel(date.toString().substring(0, 19), db.getAt(i)));
+      histories.add(HistoryModel(db.length - index,
+          date.toString().substring(0, 19), his.title, his.url));
     }
   }
 
