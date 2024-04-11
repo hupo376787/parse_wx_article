@@ -166,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Lottie.asset('assets/lottie/1708440553399.json',
+              Lottie.asset('assets/lottie/sun.json',
                   height: appSize.height / 2),
               // UnDraw(
               //   height: 1,

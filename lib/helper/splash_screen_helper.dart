@@ -174,7 +174,7 @@ class _SplashScreenHelperState extends State<SplashScreenHelper> {
           backgroundColor: Colors.white,
           splashScreenBody: Center(
             child: Lottie.asset(
-              "assets/lottie/1708440553399.json",
+              "assets/lottie/sun.json",
               repeat: false,
             ),
           ),
