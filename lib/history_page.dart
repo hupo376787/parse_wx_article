@@ -16,9 +16,9 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
 
-    for (var i = 0; i <= box.length - 1; i++) {
+    for (var i = box.length - 1; i >= 0; i--) {
       var his = HistoryModel.fromJson(box.getAt(i));
-      int index = his.index;
+      int index = box.length - 1 - his.index;
       int timespan = double.tryParse(his.timespan)!.toInt();
       var date = DateTime.fromMicrosecondsSinceEpoch(timespan);
       histories.add(HistoryModel(
