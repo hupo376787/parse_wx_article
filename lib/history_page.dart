@@ -16,13 +16,16 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
 
-    for (var i = db.length - 1; i >= 0; i--) {
-      int index = int.tryParse(db.keyAt(i).toString())!;
-      var his = db.getAt(i) as HistoryModel;
+    for (var i = 0; i <= box.length - 1; i++) {
+      var his = HistoryModel.fromJson(box.getAt(i));
+      int index = his.index;
       int timespan = double.tryParse(his.timespan)!.toInt();
       var date = DateTime.fromMicrosecondsSinceEpoch(timespan);
-      histories.add(HistoryModel(db.length - index,
-          date.toString().substring(0, 19), his.title, his.url));
+      histories.add(HistoryModel(
+          index: index,
+          timespan: date.toString().substring(0, 19),
+          title: his.title,
+          url: his.url));
     }
   }
 
@@ -34,7 +37,7 @@ class _HistoryPageState extends State<HistoryPage> {
         separatorBuilder: (context, index) {
           return const Divider();
         },
-        itemCount: db.length,
+        itemCount: box.length,
         itemBuilder: (context, index) {
           return SizedBox(
             height: 32,
@@ -46,7 +49,15 @@ class _HistoryPageState extends State<HistoryPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(4),
+                      child: Text(histories[index].index.toString()),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4),
                       child: Text(histories[index].timespan),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Text(histories[index].title),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(4),

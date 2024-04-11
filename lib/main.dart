@@ -2,7 +2,6 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:html/parser.dart';
 
 import 'package:parse_wx_article/helper/download_helper.dart';
@@ -41,6 +40,8 @@ void main() async {
     });
   }
 
+  await initHive();
+
   await SentryFlutter.init(
     (options) {
       options.dsn =
@@ -49,6 +50,11 @@ void main() async {
     // Init your App.
     appRunner: () => runApp(const MyApp()),
   );
+}
+
+Future initHive() async {
+  final dir = await path_provider.getApplicationDocumentsDirectory();
+  Hive.defaultDirectory = dir.path;
 }
 
 final ThemeData theme = ThemeData();
@@ -82,7 +88,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-late Box db;
+final Box box = Hive.box(name: "HistoryBox");
 
 class _MyHomePageState extends State<MyHomePage>
     with WidgetsBindingObserver, WindowListener {
@@ -109,9 +115,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   void initDb() async {
-    await Hive.initFlutter();
-    Hive.registerAdapter(HistoryModelAdapter());
-    db = await Hive.openBox<HistoryModel>('history');
+    Hive.registerAdapter("HistoryModel", (json) => HistoryModel.fromJson);
   }
 
   @override
@@ -267,10 +271,13 @@ class _MyHomePageState extends State<MyHomePage>
                       }
 
                       //查找历史记录
-                      if (groupValue == 'article' &&
-                          db.values.contains(_urlController.text)) {
-                        showMyToast('文章图片已经下载过啦');
-                        return;
+                      for (int i = 0; i <= box.length - 1; i++) {
+                        var value = HistoryModel.fromJson(box.getAt(i));
+                        if (groupValue == 'article' &&
+                            value.url == _urlController.text) {
+                          showMyToast('文章图片已经下载过啦');
+                          return;
+                        }
                       }
 
                       showMyToast('开始下载');
@@ -353,14 +360,15 @@ class _MyHomePageState extends State<MyHomePage>
 
                           //添加数据库
                           try {
-                            db.put(
-                                db.length.toString(),
-                                HistoryModel(
-                                    db.length,
-                                    (DateTime.now().microsecondsSinceEpoch)
-                                        .toString(),
-                                    title!,
-                                    _urlController.text));
+                            var timespan =
+                                (DateTime.now().microsecondsSinceEpoch)
+                                    .toString();
+                            var his = HistoryModel(
+                                index: box.length,
+                                timespan: timespan,
+                                title: title!,
+                                url: _urlController.text);
+                            box.put(timespan, his);
                           } catch (error) {
                             debugPrint(error.toString());
                           }

@@ -50,10 +50,12 @@ dependencies:
   theme_manager:
   flutter_launcher_icons:
   another_flutter_splash_screen:
-  hive:
-  hive_flutter:
-  webview_universal :
-  
+  hive: ^4.0.0-dev.2
+  isar_flutter_libs: ^4.0.0-dev.13
+  webview_universal:
+  get:
+  get_storage:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
