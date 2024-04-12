@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:parse_wx_article/helper/toast_helper.dart';
 import 'package:parse_wx_article/main.dart';
 import 'package:parse_wx_article/model/history_model.dart';
 import 'package:parse_wx_article/webview_page.dart';
@@ -32,10 +34,30 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Widget getWidget() {
     if (box.isEmpty) {
-      return Lottie.asset("assets/lottie/oops.json", repeat: true, height: 320);
+      return Column(
+        children: [
+          Lottie.asset("assets/lottie/oops.json", repeat: true, height: 320),
+          const Padding(
+              padding: EdgeInsets.only(bottom: 16),
+              child: Text(
+                'Oops，你还没有下载记录',
+                style: TextStyle(fontSize: 18),
+              ))
+        ],
+      );
     } else {
-      return Lottie.asset("assets/lottie/congratulations.json",
-          repeat: true, height: 320);
+      return Column(
+        children: [
+          Lottie.asset("assets/lottie/congratulations.json",
+              repeat: true, height: 320),
+          Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Text(
+                '太好了，你已经下载了${box.length}条记录~',
+                style: const TextStyle(fontSize: 18),
+              ))
+        ],
+      );
     }
   }
 
@@ -47,12 +69,6 @@ class _HistoryPageState extends State<HistoryPage> {
           child: Column(
         children: [
           getWidget(),
-          Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
-                '太好了，你已经下载了${box.length}条记录~',
-                style: const TextStyle(fontSize: 18),
-              )),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -62,32 +78,45 @@ class _HistoryPageState extends State<HistoryPage> {
             itemCount: box.length,
             itemBuilder: (context, index) {
               return SizedBox(
-                height: 32,
+                height: 50,
                 child: InkWell(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     physics: const NeverScrollableScrollPhysics(),
                     child: Row(
                       children: [
+                        const Padding(
+                          padding: EdgeInsets.all(4),
+                          child: Icon(Icons.grass),
+                        ),
                         Padding(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.fromLTRB(0, 0, 12, 0),
                           child: Text(histories[index].index.toString()),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Text(histories[index].timespan),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Text(histories[index].title),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Text(
-                            histories[index].url,
-                            softWrap: false,
-                            overflow: TextOverflow.fade,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Text(histories[index].timespan),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(4),
+                                  child: Text(histories[index].title),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Text(
+                                histories[index].url,
+                                softWrap: false,
+                                overflow: TextOverflow.fade,
+                              ),
+                            )
+                          ],
                         )
                       ],
                     ),
@@ -100,6 +129,11 @@ class _HistoryPageState extends State<HistoryPage> {
                                 inputUrl: histories[index].url,
                               )),
                     );
+                  },
+                  onLongPress: () {
+                    Clipboard.setData(
+                        ClipboardData(text: histories[index].url));
+                    showMyToast('链接🔗已复制');
                   },
                 ),
               );
