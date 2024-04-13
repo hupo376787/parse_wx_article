@@ -1,5 +1,3 @@
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -10,17 +8,12 @@ import 'package:parse_wx_article/helper/toast_helper.dart';
 
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:parse_wx_article/history_page.dart';
 import 'package:parse_wx_article/model/history_model.dart';
-import 'package:parse_wx_article/setting_page.dart';
-import 'package:parse_wx_article/splash_screen.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:lottie/lottie.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:theme_manager/theme_manager.dart';
 
 class DownloadPage extends StatefulWidget {
   const DownloadPage({super.key});
@@ -32,22 +25,35 @@ class DownloadPage extends StatefulWidget {
 final Box box = Hive.box(name: "HistoryBox");
 
 class _DownloadPageState extends State<DownloadPage>
-    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver, WindowListener {
+    with
+        AutomaticKeepAliveClientMixin<DownloadPage>,
+        WidgetsBindingObserver,
+        WindowListener {
   final TextEditingController _urlController = TextEditingController();
 
   String groupValue = 'article';
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    windowManager.addListener(this);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    super.build(context);
     final appSize = MediaQuery.of(context).size;
 
+    super.build(context);
     return SingleChildScrollView(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-          const SizedBox(height: 100),
+          const SizedBox(height: 50),
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -317,7 +323,4 @@ class _DownloadPageState extends State<DownloadPage>
       debugPrint("应用进入 detached 状态 detached");
     }
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

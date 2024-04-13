@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:parse_wx_article/download_page.dart';
 import 'package:parse_wx_article/helper/toast_helper.dart';
@@ -79,7 +80,7 @@ class _HistoryPageState extends State<HistoryPage> {
             itemCount: box.length,
             itemBuilder: (context, index) {
               return SizedBox(
-                height: 50,
+                height: 60,
                 child: InkWell(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -139,6 +140,21 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
               );
             },
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: ElevatedButton(
+              onPressed: () {
+                box.clear();
+                setState(() {
+                  histories.clear();
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white),
+              child: const Text('清空记录'),
+            ),
           )
         ],
       )),

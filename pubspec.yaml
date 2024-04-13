@@ -55,7 +55,8 @@ dependencies:
   webview_universal:
   get:
   animated_bottom_navigation_bar:
-
+  avatar_glow:
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

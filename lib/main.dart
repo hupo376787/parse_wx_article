@@ -93,11 +93,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with WidgetsBindingObserver, WindowListener {
   int bottomNavIndex = 0;
-  final iconList = <IconData>[Icons.home, Icons.history, Icons.settings];
+  final iconList = <IconData>[
+    Icons.home,
+    Icons.history,
+    Icons.settings,
+  ];
+  final descList = <String>['主页', '历史', '设置'];
   static const List<Widget> pages = [
     DownloadPage(),
     HistoryPage(),
-    SettingPage()
+    SettingPage(),
   ];
 
   @override
@@ -105,12 +110,12 @@ class _MyHomePageState extends State<MyHomePage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
-    _init();
+    init();
 
     initDb();
   }
 
-  void _init() async {
+  void init() async {
     // 添加此行以覆盖默认关闭处理程序
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       await windowManager.setPreventClose(true);
@@ -122,18 +127,56 @@ class _MyHomePageState extends State<MyHomePage>
     Hive.registerAdapter("HistoryModel", (json) => HistoryModel.fromJson);
   }
 
+  final pageController = PageController();
+  void onPageChanged(int index) {
+    setState(() {
+      bottomNavIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: AnimatedBottomNavigationBar(
-          icons: iconList,
+      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+          itemCount: iconList.length,
+          gapWidth: 0,
+          tabBuilder: (int index, bool isActive) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Column(
+                children: [
+                  Icon(
+                    iconList[index],
+                    color: isActive ? Colors.orange : Colors.black,
+                  ),
+                  Text(
+                    descList[index],
+                    style: TextStyle(
+                        color: isActive ? Colors.orange : Colors.black),
+                  )
+                ],
+              ),
+            );
+          },
           activeIndex: bottomNavIndex,
           onTap: (index) {
-            setState(() {
-              bottomNavIndex = index;
-            });
+            pageController.jumpToPage(index);
           }),
-      body: pages.elementAt(bottomNavIndex),
+      // bottomNavigationBar: AnimatedBottomNavigationBar(
+      //     icons: iconList,
+      //     activeIndex: bottomNavIndex,
+      //     activeColor: Colors.orange,
+      //     onTap: (index) {
+      //       // setState(() {
+      //       //   bottomNavIndex = index;
+      //       // });
+      //       pageController.jumpToPage(index);
+      //     }),
+      body: PageView(
+        controller: pageController,
+        onPageChanged: onPageChanged,
+        children: pages,
+      ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

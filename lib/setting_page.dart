@@ -1,3 +1,4 @@
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_manager/theme_manager.dart';
 
@@ -13,12 +14,11 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
         title: const Text('设置'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => {Navigator.of(context).pop()},
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back),
+        //   onPressed: () => {Navigator.of(context).pop()},
+        // ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -134,12 +134,20 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
               Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(
-                    'assets/icon/image.png',
-                    width: MediaQuery.of(context).size.width / 3,
-                    alignment: Alignment.center,
+                child: AvatarGlow(
+                  glowColor: Colors.orange,
+                  glowCount: 3,
+                  child: Material(
+                    elevation: 8.0,
+                    shape: const CircleBorder(),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      radius: MediaQuery.of(context).size.width / 8,
+                      child: Image.asset(
+                        'assets/icon/image.png',
+                        height: MediaQuery.of(context).size.width / 4,
+                      ),
+                    ),
                   ),
                 ),
               ),
