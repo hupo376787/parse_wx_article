@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:parse_wx_article/download_page.dart';
 import 'package:parse_wx_article/helper/toast_helper.dart';
 import 'package:parse_wx_article/main.dart';
 import 'package:parse_wx_article/model/history_model.dart';
