@@ -2,6 +2,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:html/parser.dart';
 import 'package:parse_wx_article/download_page.dart';
@@ -56,7 +57,11 @@ void main() async {
 
 Future initHive() async {
   final dir = await path_provider.getApplicationDocumentsDirectory();
-  Hive.defaultDirectory = dir.path;
+  var folder = Directory("${dir.path}//Xiaowei");
+  if (!await folder.exists()) {
+    folder.create();
+  }
+  Hive.defaultDirectory = folder.path;
 }
 
 final ThemeData theme = ThemeData();
@@ -140,6 +145,7 @@ class _MyHomePageState extends State<MyHomePage>
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
           itemCount: iconList.length,
           gapWidth: 0,
+          backgroundColor: Colors.black.withAlpha(200),
           tabBuilder: (int index, bool isActive) {
             return Padding(
               padding: const EdgeInsets.only(top: 8),

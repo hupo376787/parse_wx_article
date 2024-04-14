@@ -77,7 +77,7 @@ class _SettingPageState extends State<SettingPage> {
                             value: 'Light',
                             onChanged: (value) {
                               ThemeManager.of(context)
-                                  .setBrightness(BrightnessPreference.system);
+                                  .setBrightness(BrightnessPreference.light);
                             },
                           ),
                           const Text('亮色'),
