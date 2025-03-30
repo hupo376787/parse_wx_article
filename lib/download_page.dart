@@ -197,8 +197,13 @@ class _DownloadPageState extends State<DownloadPage>
                               .getApplicationDocumentsDirectory();
                         }
 
-                        var response =
-                            await http.get(Uri.parse(_urlController.text));
+                        var headers = {
+                          'User-Agent':
+                              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                        };
+                        var response = await http.get(
+                            Uri.parse(_urlController.text),
+                            headers: headers);
                         if (response.statusCode == 200) {
                           String body = response.body;
                           int i = 0;

@@ -134,21 +134,9 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
               Center(
-                child: AvatarGlow(
-                  glowColor: Colors.orange,
-                  glowCount: 3,
-                  child: Material(
-                    elevation: 8.0,
-                    shape: const CircleBorder(),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: MediaQuery.of(context).size.width / 8,
-                      child: Image.asset(
-                        'assets/icon/image.png',
-                        height: MediaQuery.of(context).size.width / 4,
-                      ),
-                    ),
-                  ),
+                child: Image.asset(
+                  'assets/icon/image.png',
+                  height: MediaQuery.of(context).size.width / 8,
                 ),
               ),
               const Center(

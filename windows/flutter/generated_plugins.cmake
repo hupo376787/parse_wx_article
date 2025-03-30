@@ -5,7 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   isar_flutter_libs
   permission_handler_windows
-  screen_retriever
+  screen_retriever_windows
   sentry_flutter
   system_theme
   webview_universal

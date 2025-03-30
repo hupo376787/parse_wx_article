@@ -145,7 +145,6 @@ class _MyHomePageState extends State<MyHomePage>
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
           itemCount: iconList.length,
           gapWidth: 0,
-          backgroundColor: Colors.black.withAlpha(200),
           tabBuilder: (int index, bool isActive) {
             return Padding(
               padding: const EdgeInsets.only(top: 8),
